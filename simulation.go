@@ -21,7 +21,6 @@ func StartSimulation(writes chan *writeOp) {
       http.ListenAndServe(":8080", nil)      
       }()
 
-
     for {
     select {
       case <- tickChan2:
