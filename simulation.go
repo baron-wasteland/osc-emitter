@@ -8,8 +8,12 @@ import (
 )
 
 
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+func indexHandler() http.Handler {
+  fn := func(w http.ResponseWriter, r *http.Request)  {
+    w.Write([]byte("Hey, world."))
+  }
+
+  return http.HandlerFunc(fn)
 }
 
 func StartSimulation(writes chan *writeOp) {
@@ -17,7 +21,10 @@ func StartSimulation(writes chan *writeOp) {
     writeRespChan := make(chan bool)
 
     go func() {
-      http.HandleFunc("/", handler)
+      mux := http.NewServeMux()
+
+      idx = 
+      mux.Handle("/",)
       http.ListenAndServe(":8080", nil)      
       }()
 

@@ -22,7 +22,7 @@ type readOp struct {
 
 
 func main() {
-  fmt.Println("start")
+
   tickChan1 := time.NewTicker(time.Millisecond * 10).C
   reads := make(chan *readOp)
   writes := make(chan *writeOp)
