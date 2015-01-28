@@ -18,3 +18,18 @@ We will need to support the following types of events:
  - Note on/off events
    - timed duration
    - data driven duration (like a threshold)
+
+Web Simulation
+====
+
+The web simulation serves up a basic html page with a script that upgrades the connection to a websocket, using http://www.gorillatoolkit.org/pkg/websocket
+
+To use it:
+
+    go get github.com/gorilla/websocket
+    go run main.go simulation.go
+
+Open your browser and navigate to localhost:8080/simulation.html
+Hit the 'send' button, and every 20 ms a random int will be written to a sensor object, and sensor values will be written to the terminal every 10ms.
+
+Reload the page to stop sending.
