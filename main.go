@@ -58,7 +58,8 @@ func main() {
 				sensor := strconv.Itoa(i)
 				buffer.WriteString("sensor" + sensor + ": " + val + " ")
 			}
-			fmt.Printf(buffer.String() + "\r")
+			t := time.Now()
+			fmt.Printf("\r" + t.Format(time.StampMilli) + ": " + buffer.String())
 		}
 	}
 }
