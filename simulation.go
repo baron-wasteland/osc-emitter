@@ -11,7 +11,8 @@ import (
 )
 
 type Message struct {
-	Data []int
+	Value int
+	Id    int
 }
 
 var upgrader = websocket.Upgrader{
@@ -42,16 +43,13 @@ func readWrapper(writes chan *writeOp) http.HandlerFunc {
 			// fmt.Printf("\n")
 
 			_ = json.Unmarshal(p, &m)
-			for n := 0; n < len(m.Data); n++ {
-				value := m.Data[n]
-				// fmt.Printf("%d: %d\n", n, value)
-				write := &writeOp{
-					key:  n,
-					val:  value,
-					resp: writeRespChan}
-				writes <- write
-				<-write.resp
-			}
+			// fmt.Printf("%d: %d\n", m.Id, m.Value)
+			write := &writeOp{
+				key:  m.Id,
+				val:  m.Value,
+				resp: writeRespChan}
+			writes <- write
+			<-write.resp
 
 		}
 	}
