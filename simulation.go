@@ -16,8 +16,8 @@ const (
 )
 
 type Message struct {
-	Value int
-	Id    int
+	Value      int
+	Id         int
 	SensorType int
 }
 
@@ -51,9 +51,14 @@ func readWrapper(writes chan *writeOp) http.HandlerFunc {
 			_ = json.Unmarshal(p, &m)
 			fmt.Printf("%d: %d, %d\n", m.Id, m.Value, m.SensorType)
 
+			measured := measurement{
+				sensorType: m.SensorType,
+				value:      m.Value,
+			}
+
 			write := &writeOp{
 				key:  m.Id,
-				val:  m.Value,
+				val:  measured,
 				resp: writeRespChan}
 			writes <- write
 			<-write.resp
