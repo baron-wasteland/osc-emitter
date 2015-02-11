@@ -8,15 +8,20 @@ import (
 	"strconv"
 )
 
+type measurement struct {
+  sensorType int
+  value      int
+}
+
 type writeOp struct {
 	key  int
-	val  int
+	val  measurement
 	resp chan bool
 }
 
 type readOp struct {
 	key  int
-	resp chan int
+	resp chan measurement
 }
 
 func main() {
@@ -26,10 +31,10 @@ func main() {
 	reads := make(chan *readOp)
 	writes := make(chan *writeOp)
 
-	readRespChan := make(chan int)
+	readRespChan := make(chan measurement)
 
 	go func() {
-		sData := make(map[int]int, 6)
+		sData := make(map[int]measurement, 6)
 		for {
 			select {
 			case read := <-reads:
@@ -54,9 +59,11 @@ func main() {
 					key:  i,
 					resp: readRespChan}
 				reads <- read
-				val := strconv.Itoa(<-read.resp)
-				sensor := strconv.Itoa(i)
-				buffer.WriteString("sensor" + sensor + ": " + val + " ")
+				m          := <- read.resp
+				val        := strconv.Itoa(m.value)
+				sensorId   := strconv.Itoa(i)
+				sensorType := strconv.Itoa(m.sensorType)
+				buffer.WriteString("sensor" + sensorId + "[" + sensorType + "]: " + val + " ")
 			}
 			t := time.Now()
 			fmt.Printf("\r" + t.Format(time.StampMilli) + ": " + buffer.String())

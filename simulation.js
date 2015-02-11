@@ -4,24 +4,49 @@ $( document ).ready(function() {
     var sensors = []
     var sensor0Interval = null
 
+    // TODO query websocket server for sensor types ID map
+    var SENSOR_CONTINUOUS = 0;
+    var SENSOR_IMPULSE = 1;
+
     var sensorTypes = {
         "heat": {
+            sensorType: SENSOR_CONTINUOUS,
             minVal: 0,
             maxVal: 2500,
             initVal: 0,
             upIntervalMs: 20,
             downIntervalMs: 60,
             upFunc: function( s ) {
-                if ( s.value < s.maxVal ) { 
-                    s.value++ 
+                if ( s.value < s.maxVal ) {
+                    s.value++
                 } else {
                     clearInterval(s.interval);
                 }
             },
-            downFunc:function( s ) { 
+            downFunc:function( s ) {
                 if ( s.value > s.minVal ) {
-                    s.value-- 
+                    s.value--;
                 } else {
+                    clearInterval(s.interval);
+                }
+            }
+        },
+        "whack": {
+            sensorType: SENSOR_IMPULSE,
+            minVal: 0,
+            maxVal: 1024,
+            initVal: 0,
+            upIntervalMs: 20,
+            downIntervalMs: 100,
+            upFunc: function(s) {
+                s.value = s.maxVal;
+                clearInterval(s.interval);
+            },
+            downFunc: function(s) {
+                if (s.value > s.minVal) {
+                    s.value = Math.max(s.value-250, s.minVal);
+                } else {
+                    s.value = s.minVal;
                     clearInterval(s.interval);
                 }
             }
@@ -39,8 +64,8 @@ $( document ).ready(function() {
 
     $(".sensor").mousedown(function() {
         sensor = getSensor( $(this) );
-        updateSensor( 
-            sensor, 
+        updateSensor(
+            sensor,
             sensor.type.upIntervalMs,
             sensor.type.upFunc
         );
@@ -48,10 +73,10 @@ $( document ).ready(function() {
 
     $(".sensor").mouseup(function() {
         sensor = getSensor( $(this) );
-        updateSensor( 
-            sensor, 
+        updateSensor(
+            sensor,
             sensor.type.downIntervalMs,
-            sensor.type.downFunc  
+            sensor.type.downFunc
         );
     });
 
@@ -76,6 +101,7 @@ $( document ).ready(function() {
                 minVal: sensorTypes[ sensor.attr("type")].minVal,
                 maxVal: sensorTypes[ sensor.attr("type")].maxVal,
                 id: parseInt( sensorId.split("-")[1] ),
+                sensorType: sensorTypes[ sensor.attr("type")].sensorType,
                 type: sensorTypes[ sensor.attr("type")]
             }
         }

@@ -10,9 +10,15 @@ import (
 	// "time"
 )
 
+const (
+	SENSOR_CONTINUOUS = 0
+	SENSOR_IMPULSE = 1
+)
+
 type Message struct {
-	Value int
-	Id    int
+	Value      int
+	Id         int
+	SensorType int
 }
 
 var upgrader = websocket.Upgrader{
@@ -43,10 +49,16 @@ func readWrapper(writes chan *writeOp) http.HandlerFunc {
 			// fmt.Printf("\n")
 
 			_ = json.Unmarshal(p, &m)
-			// fmt.Printf("%d: %d\n", m.Id, m.Value)
+			fmt.Printf("%d: %d, %d\n", m.Id, m.Value, m.SensorType)
+
+			measured := measurement{
+				sensorType: m.SensorType,
+				value:      m.Value,
+			}
+
 			write := &writeOp{
 				key:  m.Id,
-				val:  m.Value,
+				val:  measured,
 				resp: writeRespChan}
 			writes <- write
 			<-write.resp
