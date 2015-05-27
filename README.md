@@ -27,3 +27,12 @@ go run main.go serve.go instrument.go
 
 Load the web manager ui to view instrument state: http://localhost:8080/manager.html
 Load the web simulation ui to change state: http://localhost:8080/simulation.html
+
+TODO
+===
+- instrument interface to create other types of instruments
+- refactor current instrument implemenation to utilize a general interface
+- create other types of instruments (linear/rotary encoder, always on/off, others)
+- web ui using config files with config endpoint for js
+- how to tweak config settings during performance?
+- better web sim physics
