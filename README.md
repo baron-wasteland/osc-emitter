@@ -2,34 +2,37 @@
 
 Takes various sensor inputs and outputs a stream of OSC messages.
 
+Install Dependencies
+======
+```
+brew install portmidi
+go get github.com/gorilla/websocket
+go get github.com/hypebeast/go-osc/osc
+```
 
 Overview
-=====
+===
+main loop manages slice of Instruments, with reads and writes flowing through channels.
 
-The main loop will manage an object with the value for each sensor, with reads and writes passing through a channel that can be handed to other functions, a la https://gobyexample.com/stateful-goroutines
+separate loops will receive input form sensors (or the web simulation) and update Instruments.
 
-Code that needs to write to the sensor object can do so at will.
+each Instrument will send a constant stream of OSC messages to N receivers.
 
-Another routine will check the values of that object every Xms and dispatch OSC messages.
 
-We will need to support the following types of events:
+Run it
+===
+```
+go run main.go serve.go instrument.go
+```
 
- - Constant stream of OSC messages, repeating the last value if unchanged.
- - Note on/off events
-   - timed duration
-   - data driven duration (like a threshold)
+Load the web manager ui to view instrument state: http://localhost:8080/manager.html
+Load the web simulation ui to change state: http://localhost:8080/simulation.html
 
-Web Simulation
-====
-
-The web simulation serves up a basic html page with a script that upgrades the connection to a websocket, using http://www.gorillatoolkit.org/pkg/websocket
-
-To use it:
-
-    go get github.com/gorilla/websocket
-    go run main.go simulation.go
-
-Open your browser and navigate to localhost:8080/simulation.html
-Hit the 'send' button, and every 20 ms a random int will be written to a sensor object, and sensor values will be written to the terminal every 10ms.
-
-Reload the page to stop sending.
+TODO
+===
+- instrument interface to create other types of instruments
+- refactor current instrument implemenation to utilize a general interface
+- create other types of instruments (linear/rotary encoder, always on/off, others)
+- web ui using config files with config endpoint for js
+- how to tweak config settings during performance?
+- better web sim physics

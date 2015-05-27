@@ -1,6 +1,6 @@
 $( document ).ready(function() {
 
-    var serversocket = new WebSocket("ws://localhost:8080/echo");
+    var serversocket = new WebSocket("ws://localhost:8080/simulation");
     var sensors = []
     var sensor0Interval = null
 

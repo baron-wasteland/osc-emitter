@@ -1,0 +1,13 @@
+{
+    "oscConfig": [
+        {
+            "host": "localhost",
+            "port": 7400
+        },
+        {
+            "host": "localhost",
+            "port": 10000
+        }
+
+    ]
+}

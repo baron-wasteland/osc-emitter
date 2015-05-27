@@ -1,0 +1,178 @@
+{
+    "Instruments": [
+        {
+            "id": 0,
+            "threshold": 10,
+            "sensorType": 0,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.20,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.40,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "threshold": 10,
+            "sensorType": 0,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "threshold": 10,
+            "sensorType": 0,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "threshold": 10,
+            "sensorType": 0,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "threshold": 10,
+            "sensorType": 0,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "threshold": 10,
+            "sensorType": 1,
+            "controls": [
+                {
+                    "name": "blah",
+                    "minVal": 0,
+                    "maxVal": 100
+                }
+            ],
+            "notes": [
+                {
+                    "threshold": 0.0,
+                    "value": 64,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 66,
+                    "velocity": 100
+                },
+                {
+                    "threshold": 0.0,
+                    "value": 68,
+                    "velocity": 100
+                }
+            ]
+        }
+    ]
+}

@@ -1,72 +1,148 @@
 package main
 
 import (
-	"fmt"
-	"time"
+	"encoding/json"
 
-	"bytes"
-	"strconv"
+	"fmt"
+	"os"
+	"os/signal"
+
+	"syscall"
 )
 
+const (
+	NUM_SENSORS       = 6
+	SENSOR_CONTINUOUS = 0
+	SENSOR_IMPULSE    = 1
+	OSC_SEND_FREQ_MS  = 100
+)
+
+type readInstrument struct {
+	key  int
+	resp chan *Instrument
+}
+
 type measurement struct {
-  sensorType int
-  value      int
+	sensorId   int
+	sensorType int
+	value      int
 }
 
-type writeOp struct {
-	key  int
-	val  measurement
-	resp chan bool
+type SensorType struct {
+	MinVal int    `json:"minVal"`
+	MaxVal int    `json:"maxVal"`
+	Id     int    `json:"id"`
+	Name   string `json:"name"`
 }
 
-type readOp struct {
-	key  int
-	resp chan measurement
+type SensorConfig struct {
+	Types []SensorType `json:"types"`
+}
+
+type InstrumentConfig struct {
+	Id         int          `json:"id"`
+	Threshold  int          `json:"threshold"`
+	SensorType int          `json:"sensorType"`
+	Controls   []OscControl `json:"controls"`
+	Notes      []Note       `json:"notes"`
+}
+
+type Instruments struct {
+	Instruments []InstrumentConfig `json:"instruments"`
+}
+
+type OscConfig struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+
+type OscConfigs struct {
+	OscConfig []OscConfig `json:"oscConfig"`
+}
+
+func loadConfig(oscFile string, sensorFile string, instrumentsFile string) ([]*Instrument, error) {
+	// setup osc hosts
+	file, _ := os.Open(oscFile)
+	decoder := json.NewDecoder(file)
+	oscConfig := OscConfigs{}
+	err := decoder.Decode(&oscConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// setup sensor defs
+	file, _ = os.Open(sensorFile)
+	decoder = json.NewDecoder(file)
+	sensorConfig := SensorConfig{}
+	err = decoder.Decode(&sensorConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	// setup instruments
+	file, _ = os.Open(instrumentsFile)
+	decoder = json.NewDecoder(file)
+	instrumentConfig := Instruments{}
+	err = decoder.Decode(&instrumentConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	instruments := make([]*Instrument, 0)
+	for _, instrument := range instrumentConfig.Instruments {
+		ins := CreateInstrument(
+			instrument.Id,
+			instrument.Notes,
+			instrument.Controls,
+			sensorConfig.Types[instrument.SensorType],
+			oscConfig.OscConfig)
+
+		instruments = append(instruments, ins)
+	}
+
+	return instruments, nil
 }
 
 func main() {
-	fmt.Println("started")
 
-	tickChan1 := time.NewTicker(time.Millisecond * 10).C
-	reads := make(chan *readOp)
-	writes := make(chan *writeOp)
+	// TODO: setup some file watches for auto config reload
+	instruments, err := loadConfig("config/osc.json", "config/sensors.json", "config/instruments.json")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("started main")
 
-	readRespChan := make(chan measurement)
+	// channel to receive sensor updates on
+	updates := make(chan measurement, 5000)
 
+	// channel to request instrument details on
+	reads := make(chan *readInstrument)
+
+	// setup signal handling
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
+
+	// TODO: add some flags to enable/disable simulation or something
 	go func() {
-		sData := make(map[int]measurement, 6)
-		for {
-			select {
-			case read := <-reads:
-				read.resp <- sData[read.key]
-			case write := <-writes:
-				sData[write.key] = write.val
-				write.resp <- true
-			}
-		}
-	}()
-
-	go func() {
-		StartSimulation(writes)
+		StartServer(updates, reads)
 	}()
 
 	for {
 		select {
-		case <-tickChan1:
-			var buffer bytes.Buffer
-			for i := 0; i <= 5; i++ {
-				read := &readOp{
-					key:  i,
-					resp: readRespChan}
-				reads <- read
-				m          := <- read.resp
-				val        := strconv.Itoa(m.value)
-				sensorId   := strconv.Itoa(i)
-				sensorType := strconv.Itoa(m.sensorType)
-				buffer.WriteString("sensor" + sensorId + "[" + sensorType + "]: " + val + " ")
-			}
-			t := time.Now()
-			fmt.Printf("\r" + t.Format(time.StampMilli) + ": " + buffer.String())
+		// update instrument from sensor/simulation
+		case m := <-updates:
+			instruments[m.sensorId].update(m)
+		// manager page state reads
+		case read := <-reads:
+			// fmt.Println(instruments[read.key])
+			read.resp <- instruments[read.key]
+		case <-signals:
+			fmt.Println("signal received, cleaning up")
+			// placeholder for when we have actual cleanup work
+			fmt.Println("cleanup complete, exiting")
+			os.Exit(0)
 		}
 	}
+
 }
