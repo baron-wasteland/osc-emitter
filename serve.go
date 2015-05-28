@@ -32,7 +32,14 @@ func simulation(updates chan measurement) http.HandlerFunc {
 			return
 		}
 
+		msg := "connected"
+		msgBytes := []byte(msg)
+		if err = conn.WriteMessage(websocket.TextMessage, msgBytes); err != nil {
+			fmt.Println(err)
+		}
+
 		for {
+
 			_, p, err := conn.ReadMessage()
 			if err != nil {
 				return

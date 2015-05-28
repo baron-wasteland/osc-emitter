@@ -1,6 +1,7 @@
 $( document ).ready(function() {
 
-    var serversocket = new WebSocket("ws://localhost:8080/managerws");
+    var host = window.location.host
+    var serversocket = new WebSocket("ws://" + host + "/managerws");
 
     serversocket.onopen = function() {
         serversocket.send("Connection init");
