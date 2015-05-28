@@ -2,11 +2,10 @@ package main
 
 import (
 	"encoding/json"
-
+	"flag"
 	"fmt"
 	"os"
 	"os/signal"
-
 	"syscall"
 )
 
@@ -35,10 +34,6 @@ type SensorType struct {
 	Name   string `json:"name"`
 }
 
-type SensorConfig struct {
-	Types []SensorType `json:"types"`
-}
-
 type InstrumentConfig struct {
 	Id         int          `json:"id"`
 	Threshold  int          `json:"threshold"`
@@ -47,70 +42,50 @@ type InstrumentConfig struct {
 	Notes      []Note       `json:"notes"`
 }
 
-type Instruments struct {
-	Instruments []InstrumentConfig `json:"instruments"`
-}
-
 type OscConfig struct {
 	Host string `json:"host"`
 	Port int    `json:"port"`
 }
 
-type OscConfigs struct {
-	OscConfig []OscConfig `json:"oscConfig"`
-}
-
-func loadConfig(oscFile string, sensorFile string, instrumentsFile string) ([]*Instrument, error) {
-	// setup osc hosts
-	file, _ := os.Open(oscFile)
-	decoder := json.NewDecoder(file)
-	oscConfig := OscConfigs{}
-	err := decoder.Decode(&oscConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	// setup sensor defs
-	file, _ = os.Open(sensorFile)
-	decoder = json.NewDecoder(file)
-	sensorConfig := SensorConfig{}
-	err = decoder.Decode(&sensorConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	// setup instruments
-	file, _ = os.Open(instrumentsFile)
-	decoder = json.NewDecoder(file)
-	instrumentConfig := Instruments{}
-	err = decoder.Decode(&instrumentConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	instruments := make([]*Instrument, 0)
-	for _, instrument := range instrumentConfig.Instruments {
-		ins := CreateInstrument(
-			instrument.Id,
-			instrument.Notes,
-			instrument.Controls,
-			sensorConfig.Types[instrument.SensorType],
-			oscConfig.OscConfig)
-
-		instruments = append(instruments, ins)
-	}
-
-	return instruments, nil
+type Config struct {
+	Sensors     []SensorType       `json:"sensors"`
+	OscConfig   []OscConfig        `json:"oscConfig"`
+	Instruments []InstrumentConfig `json:"instruments"`
 }
 
 func main() {
 
-	// TODO: setup some file watches for auto config reload
-	instruments, err := loadConfig("config/osc.json", "config/sensors.json", "config/instruments.json")
+	// parse some flags
+	configFile := flag.String("c", "", "path to config file")
+	flag.Parse()
+	if *configFile == "" {
+		fmt.Println("You must pass a config file, run with -h to see how")
+		os.Exit(1)
+	}
+
+	// read config
+	file, _ := os.Open(*configFile)
+	decoder := json.NewDecoder(file)
+	config := Config{}
+	err := decoder.Decode(&config)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+	// make instruments from config
+	instruments := make([]*Instrument, 0)
+	for _, instrument := range config.Instruments {
+		ins := CreateInstrument(
+			instrument.Id,
+			instrument.Notes,
+			instrument.Controls,
+			config.Sensors[instrument.SensorType],
+			config.OscConfig)
+
+		instruments = append(instruments, ins)
+	}
+
 	fmt.Println("started main")
 
 	// channel to receive sensor updates on
