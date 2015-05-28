@@ -1,5 +1,30 @@
 {
-    "Instruments": [
+    "oscConfig": [
+        {
+            "host": "localhost",
+            "port": 7400
+        },
+        {
+            "host": "localhost",
+            "port": 10000
+        }
+
+    ],
+    "sensors": [
+        {
+            "id": 0,
+            "name": "SENSOR_CONTINUOUS",
+            "minVal": 0,
+            "maxVal": 2500
+        },
+        {
+            "id": 1,
+            "name": "SENSOR_IMPULSE",
+            "minVal": 0,
+            "maxVal": 1024
+        }
+    ],
+    "instruments": [
         {
             "id": 0,
             "threshold": 10,
