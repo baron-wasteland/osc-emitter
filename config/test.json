@@ -33,7 +33,7 @@
                 {
                     "name": "blah",
                     "minVal": 0,
-                    "maxVal": 100
+                    "maxVal": 1
                 }
             ],
             "notes": [
@@ -57,7 +57,7 @@
         {
             "id": 1,
             "threshold": 10,
-            "sensorType": 0,
+            "sensorType": 1,
             "controls": [
                 {
                     "name": "blah",

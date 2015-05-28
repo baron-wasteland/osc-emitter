@@ -24,7 +24,7 @@ go run main.go serve.go instrument.go -c config/test.json
 ```
 
 - Load the web manager ui to view instrument state: http://localhost:8080/manager.html
-- Load the web simulation ui to change state: http://localhost:8080/simulation.html
+- Load the web simulation ui to change state: http://localhost:8080/simulation.html (works on mobile, just change localhost to the proper ip)
 - start things that listen for OSC and map stuff
 
 Create other config files for other situations.

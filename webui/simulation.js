@@ -1,6 +1,7 @@
 $( document ).ready(function() {
 
-    var serversocket = new WebSocket("ws://localhost:8080/simulation");
+    var host = window.location.host
+    var serversocket = new WebSocket("ws://" + host + "/simulation");
     var sensors = []
     var sensor0Interval = null
 
@@ -61,23 +62,29 @@ $( document ).ready(function() {
     serversocket.onmessage = function(e) {
         document.getElementById('comms').innerHTML += "Received: " + e.data + "<br>";
     };
+ 
+    $(".sensor").each(function(sId) {
+        // there's probably a better way to bind these events, but i don't care
+        s = document.getElementById($(this).attr("id"))
+        s.addEventListener("pointerdown", function(e) {
+            console.log("onDown")
+            sensor = getSensor( $(this) );
+            updateSensor(
+                sensor,
+                sensor.type.upIntervalMs,
+                sensor.type.upFunc
+            );
+        });
 
-    $(".sensor").mousedown(function() {
-        sensor = getSensor( $(this) );
-        updateSensor(
-            sensor,
-            sensor.type.upIntervalMs,
-            sensor.type.upFunc
-        );
-    });
-
-    $(".sensor").mouseup(function() {
-        sensor = getSensor( $(this) );
-        updateSensor(
-            sensor,
-            sensor.type.downIntervalMs,
-            sensor.type.downFunc
-        );
+        s.addEventListener("pointerup", function(e) {
+            console.log("onUp")
+            sensor = getSensor( $(this) );
+            updateSensor(
+                sensor,
+                sensor.type.downIntervalMs,
+                sensor.type.downFunc
+            );
+        });
     });
 
     function updateSensor( sensor, intervalMs, updateFunc ) {

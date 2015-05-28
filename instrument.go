@@ -50,9 +50,6 @@ func CreateInstrument(id int, notes []Note, controls []OscControl, sensorType Se
 
 	// make multiple OSC senders
 	c := make([]*osc.Client, 0)
-	// for i := 0; i < len(oscConfig); i++ {
-	// 	c[i] = osc.NewClient(oscConfig[i].host, oscConfig[i].port)
-	// }
 	for _, config := range oscConfig {
 		c = append(c, osc.NewClient(config.Host, config.Port))
 	}
