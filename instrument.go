@@ -26,6 +26,12 @@ type Note struct {
 type Instrument struct {
 	// identify this instrument, should match sensor id?
 	Id int `json:"id"`
+	// midi device ID to bind to, multiple instruments can share
+	MidiDeviceId int `json:"midiDeviceId"`
+	// midi channel for notes
+	NotesMidiChannel int `json:"notesMidiChannel"`
+	// midi channel for volume
+	VolumeMidiChannel int `json:"volumeMidiChannel"`
 	// osc client, each instrument must have it's own
 	clients []*osc.Client
 	// store sensor value
@@ -44,29 +50,6 @@ type Instrument struct {
 	BasePath string `json:"basePath"`
 	// notes!
 	Notes []Note `json:"notes"`
-}
-
-func CreateInstrument(id int, notes []Note, controls []OscControl, sensorType SensorType, oscConfig []OscConfig) *Instrument {
-
-	// make multiple OSC senders
-	c := make([]*osc.Client, 0)
-	for _, config := range oscConfig {
-		c = append(c, osc.NewClient(config.Host, config.Port))
-	}
-
-	ins := &Instrument{
-		Id:         id,
-		BasePath:   "/instruments",
-		clients:    c,
-		oscTick:    time.NewTicker(time.Millisecond * time.Duration(OSC_SEND_FREQ_MS)),
-		SensorType: sensorType,
-		Intensity:  0.0,
-		Controls:   controls,
-		Notes:      notes,
-		Threshold:  10}
-
-	ins.start()
-	return ins
 }
 
 func (ins *Instrument) translate(val int, fromMax int, fromMin int, toMax int, toMin int) float32 {
@@ -121,6 +104,8 @@ func (ins *Instrument) send() {
 		for _, note := range ins.Notes {
 			noteMsg := osc.NewMessage(ins.BasePath + "/note")
 			noteMsg.Append(int32(ins.Id))
+			noteMsg.Append(int32(ins.MidiDeviceId))
+			noteMsg.Append(int32(ins.NotesMidiChannel))
 			noteMsg.Append(int32(note.Value))
 			noteMsg.Append(note.Active)
 			noteMsg.Append(int32(note.Velocity))

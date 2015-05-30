@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/hypebeast/go-osc/osc"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 const (
@@ -35,11 +37,14 @@ type SensorType struct {
 }
 
 type InstrumentConfig struct {
-	Id         int          `json:"id"`
-	Threshold  int          `json:"threshold"`
-	SensorType int          `json:"sensorType"`
-	Controls   []OscControl `json:"controls"`
-	Notes      []Note       `json:"notes"`
+	Id                int          `json:"id"`
+	MidiDeviceId      int          `json:"midiDeviceId"`
+	NotesMidiChannel  int          `json:"notesMidiChannel"`
+	VolumeMidiChannel int          `json:"volumeMidiChannel"`
+	Threshold         int          `json:"threshold"`
+	SensorType        int          `json:"sensorType"`
+	Controls          []OscControl `json:"controls"`
+	Notes             []Note       `json:"notes"`
 }
 
 type OscConfig struct {
@@ -76,12 +81,37 @@ func main() {
 	// make instruments from config
 	instruments := make([]*Instrument, 0)
 	for _, instrument := range config.Instruments {
-		ins := CreateInstrument(
-			instrument.Id,
-			instrument.Notes,
-			instrument.Controls,
-			config.Sensors[instrument.SensorType],
-			config.OscConfig)
+
+		// make multiple OSC senders
+		clients := make([]*osc.Client, 0)
+		for _, conf := range config.OscConfig {
+			clients = append(clients, osc.NewClient(conf.Host, conf.Port))
+		}
+
+		ins := &Instrument{
+			Id:                instrument.Id,
+			MidiDeviceId:      instrument.MidiDeviceId,
+			NotesMidiChannel:  instrument.NotesMidiChannel,
+			VolumeMidiChannel: instrument.VolumeMidiChannel,
+			BasePath:          "/instruments",
+			clients:           clients,
+			oscTick:           time.NewTicker(time.Millisecond * time.Duration(OSC_SEND_FREQ_MS)),
+			SensorType:        config.Sensors[instrument.SensorType],
+			Intensity:         0.0,
+			Controls:          instrument.Controls,
+			Notes:             instrument.Notes,
+			Threshold:         10}
+
+		ins.start()
+		fmt.Println(ins)
+
+		// ins := CreateInstrument(
+		// 	instrument.Id,
+		// 	instrument.MidiDeviceId,
+		// 	instrument.Notes,
+		// 	instrument.Controls,
+		// 	config.Sensors[instrument.SensorType],
+		// 	config.OscConfig)
 
 		instruments = append(instruments, ins)
 	}

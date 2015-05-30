@@ -34,7 +34,22 @@
             "sensorType": 0,
             "controls": [
                 {
-                    "name": "blah",
+                    "name": "A",
+                    "minVal": 1,
+                    "maxVal": 0
+                },
+                {
+                    "name": "noise",
+                    "minVal": 0,
+                    "maxVal": 0.7
+                },
+                {
+                    "name": "c",
+                    "minVal": 0,
+                    "maxVal": 1
+                },
+                {
+                    "name": "d",
                     "minVal": 0,
                     "maxVal": 1
                 }
@@ -42,17 +57,17 @@
             "notes": [
                 {
                     "threshold": 0.0,
-                    "value": 64,
+                    "value": 14,
                     "velocity": 100
                 },
                 {
                     "threshold": 0.20,
-                    "value": 66,
+                    "value": 21,
                     "velocity": 100
                 },
                 {
                     "threshold": 0.40,
-                    "value": 68,
+                    "value": 35,
                     "velocity": 100
                 }
             ]
