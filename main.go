@@ -103,15 +103,6 @@ func main() {
 			Threshold:         10}
 
 		ins.start()
-		fmt.Println(ins)
-
-		// ins := CreateInstrument(
-		// 	instrument.Id,
-		// 	instrument.MidiDeviceId,
-		// 	instrument.Notes,
-		// 	instrument.Controls,
-		// 	config.Sensors[instrument.SensorType],
-		// 	config.OscConfig)
 
 		instruments = append(instruments, ins)
 	}
